@@ -545,16 +545,18 @@ class EventHandler(object):
         self._window.cursor_handler.set_cursor_type(constants.NORMAL_CURSOR)
 
         if (event.button == 1):
+            # Swipe left or right
+            if event.get_state() & Gdk.ModifierType.SHIFT_MASK:
+                swipe_inc=10
+            else:
+                swipe_inc=1
 
-            if event.x_root == self._pressed_pointer_pos_x and \
-                event.y_root == self._pressed_pointer_pos_y and \
-                not self._window.was_out_of_focus:
-
-                if event.get_state() & Gdk.ModifierType.SHIFT_MASK:
-                    self._flip_page(10)
+            if not self._window.was_out_of_focus:
+                if event.x_root < self._pressed_pointer_pos_x:
+                    self._flip_page(-swipe_inc)
                 else:
-                    self._flip_page(1)
-
+                    self._flip_page(swipe_inc)
+                
             else:
                 self._window.was_out_of_focus = False
 
