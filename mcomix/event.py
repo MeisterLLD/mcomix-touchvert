@@ -20,6 +20,7 @@ class EventHandler(object):
         self._last_pointer_pos_y = 0
         self._pressed_pointer_pos_x = 0
         self._pressed_pointer_pos_y = 0
+        self._last_pressed_time = 0
 
         #: For scrolling "off the page".
         self._extra_scroll_events = 0
@@ -525,6 +526,7 @@ class EventHandler(object):
             self._pressed_pointer_pos_y = event.y_root
             self._last_pointer_pos_x = event.x_root
             self._last_pointer_pos_y = event.y_root
+            self._last_pressed_time = event.time
 
         elif event.button == 2:
             self._window.actiongroup.get_action('lens').set_active(True)
@@ -546,17 +548,30 @@ class EventHandler(object):
 
         if (event.button == 1):
             # Swipe left or right
+            # Choose number of pages to flip based on shift mask
             if event.get_state() & Gdk.ModifierType.SHIFT_MASK:
                 swipe_inc=10
             else:
                 swipe_inc=1
 
+            # Choose minimum swipe distance as percentage of screen width
+            swipe_dist_min = 0.15 * self._window.get_screen().get_width()
+
+            # Handle swipes but preserve the old functionality to advance on click
             if not self._window.was_out_of_focus:
-                if event.x_root < self._pressed_pointer_pos_x:
-                    self._flip_page(-swipe_inc)
-                else:
+                if event.x_root < self._pressed_pointer_pos_x - swipe_dist_min:
                     self._flip_page(swipe_inc)
-                
+                elif event.x_root > self._pressed_pointer_pos_x + swipe_dist_min:
+                    self._flip_page(-swipe_inc)
+                elif (event.time - self._last_pressed_time) > 1000:
+                    # For touch screens, toggle Fullscreen on long press (if not swiping)
+                    if self._window.is_fullscreen:
+                        self._window.actiongroup.get_action('fullscreen').set_active(False)
+                    else:
+                        self._window.actiongroup.get_action('fullscreen').set_active(True)
+                elif event.x_root == self._pressed_pointer_pos_x:
+                    # This is the original action. Advance on click.
+                    self._flip_page(swipe_inc) 
             else:
                 self._window.was_out_of_focus = False
 
