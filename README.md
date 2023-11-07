@@ -1,5 +1,8 @@
 # MComix README
 
+This is a fork of [MComix](https://sourceforge.net/p/mcomix) which adds support
+for touchscreen gestures. 
+
 ## About
 
 MComix is a user-friendly, customizable image viewer. It is specifically
