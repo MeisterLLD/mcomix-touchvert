@@ -1,5 +1,14 @@
-# MComix 3.0.1
-## In development
+# MComix 3.1.0
+## Release date: 2024-01-21
+
+### Features
+
+- Image colors can be negated in the Image Enhancement dialog.
+  Furthermore, enhancements now apply to most UI elements, such as
+  sidebar thumbnails, magnified lens image and library covers.
+- "Fit to size" has been generalised. Bounds can now be set
+  independently for width and height, and different bounds can be
+  applied to wide pages and other pages.
 
 ### Bug Fixes
 
@@ -16,6 +25,8 @@
 - Improved robustness to invalid UTF-8.
 - Fixed copy/paste error in application metadata XML file
   (thanks to Emfox Zhou)
+- The library search field now considers not only the book name,
+  but also its full path, as the tooltip already stated.
 
 # MComix 3.0.0
 ## Release date: 2023-09-16

@@ -100,12 +100,12 @@ def fit_in_rectangle(src, width, height, keep_ratio=True, scale_up=False, rotati
 
     If <src> has an alpha channel it gets a checkboard background.
     """
-    # "Unbounded" really means "bounded to 10000 px" - for simplicity.
+    # "Unbounded" really means "bounded to RENDER_SIZE_LIMIT" - for simplicity.
     # MComix would probably choke on larger images anyway.
     if width < 0:
-        width = 100000
+        width = constants.RENDER_SIZE_LIMIT
     elif height < 0:
-        height = 100000
+        height = constants.RENDER_SIZE_LIMIT
     width = max(width, 1)
     height = max(height, 1)
 
@@ -458,7 +458,7 @@ def load_pixbuf_data(imgdata):
     return pixbuf
 
 def enhance(pixbuf, brightness=1.0, contrast=1.0, saturation=1.0,
-  sharpness=1.0, autocontrast=False):
+  sharpness=1.0, autocontrast=False, invert_color=False):
     """Return a modified pixbuf from <pixbuf> where the enhancement operations
     corresponding to each argument has been performed. A value of 1.0 means
     no change. If <autocontrast> is True it overrides the <contrast> value,
@@ -476,6 +476,8 @@ def enhance(pixbuf, brightness=1.0, contrast=1.0, saturation=1.0,
         im = ImageEnhance.Color(im).enhance(saturation)
     if sharpness != 1.0:
         im = ImageEnhance.Sharpness(im).enhance(sharpness)
+    if invert_color:
+        im = ImageOps.invert(im)
     return pil_to_pixbuf(im)
 
 def _get_png_implied_rotation(pixbuf_or_image):

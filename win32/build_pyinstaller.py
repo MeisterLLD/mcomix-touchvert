@@ -30,7 +30,8 @@ having to play around with relative path names.
                mingw-w64-x86_64-python \
                mingw-w64-x86_64-python-gobject \
                mingw-w64-x86_64-python-pillow \
-               mingw-w64-x86_64-python-pymupdf
+               mingw-w64-x86_64-python-pymupdf \
+               mingw-w64-x86_64-libjxl
 
     2. In the same shell, install pyinstaller with pip:
 
@@ -149,7 +150,7 @@ def copy_other_files() -> None:
 def create_release_archive() -> None:
     """ Packs the contents of the release directory. """
     print("Creating ZIP archive...")
-    with zipfile.ZipFile(f'dist/mcomix-win64-{constants.VERSION}.zip', 'w', compression=zipfile.ZIP_LZMA) as zip:
+    with zipfile.ZipFile(f'dist/mcomix-win64-{constants.VERSION}.zip', 'w', compression=zipfile.ZIP_DEFLATED) as zip:
         basedir = pathlib.Path('dist/MComix/')
         for dirpath, dirnames, filenames in os.walk('dist/MComix/'):
             currentdir = pathlib.Path(dirpath)

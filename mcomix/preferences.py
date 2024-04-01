@@ -81,6 +81,7 @@ prefs = {
     'saturation': 1.0,
     'sharpness': 1.0,
     'auto contrast': False,
+    'invert color': False,
     'max pages to cache': 7,
     'window x': 0,
     'window y': 0,
@@ -103,8 +104,10 @@ prefs = {
     'wrap mouse scroll': False,
     'scaling quality': 2,  # GdkPixbuf.InterpType.BILINEAR
     'escape quits': False,
-    'fit to size mode': constants.ZoomMode.HEIGHT,
-    'fit to size px': 1800,
+    'fit to size width wide': 3790,
+    'fit to size height wide': 960,
+    'fit to size width other': 1450,
+    'fit to size height other': 1800,
     'scan for new books on library startup': True,
     'openwith commands': [],  # (label, command) pairs
     'animation mode': constants.ANIMATION_NORMAL,

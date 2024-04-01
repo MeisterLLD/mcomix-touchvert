@@ -156,12 +156,16 @@ class ZoomModel(object):
         if fitmode == constants.ZoomMode.BEST or \
             (manual and allow_upscaling and all(tools.smaller(union_size, screen_size))):
             return screen_size
+        if fitmode == constants.ZoomMode.SIZE:
+            if union_size[constants.PageAxis.WIDTH] > union_size[constants.PageAxis.HEIGHT]:
+                return [int(prefs['fit to size width wide']),
+                    int(prefs['fit to size height wide'])]
+            else:
+                return [int(prefs['fit to size width other']),
+                    int(prefs['fit to size height other'])]
         result = [None] * len(screen_size)
         if not manual:
             fixed_size = None
-            if fitmode == constants.ZoomMode.SIZE:
-                fitmode = prefs['fit to size mode']  # reassigning fitmode
-                fixed_size = int(prefs['fit to size px'])
             if fitmode == constants.ZoomMode.WIDTH:
                 axis = constants.PageAxis.WIDTH
             elif fitmode == constants.ZoomMode.HEIGHT:

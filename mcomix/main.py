@@ -555,6 +555,15 @@ class MainWindow(Gtk.Window):
         self.statusbar.update()
         self.update_title()
 
+    def update_icon(self, default=False):
+        if (self.filehandler.archive_type is not None
+            and prefs['archive thumbnail as icon']):
+            pixbuf = self.imagehandler.get_thumbnail(1, 48, 48)
+            pixbuf = self.enhancer.enhance(pixbuf)
+            self.set_icon(pixbuf)
+        elif (default):
+            self.set_icon_list(icons.mcomix_icons())
+
     def _page_available(self, page):
         """ Called whenever a new page is ready for displaying. """
         # Refresh display when currently opened page becomes available.
@@ -565,11 +574,8 @@ class MainWindow(Gtk.Window):
             self._update_page_information()
 
         # Use first page as application icon when opening archives.
-        if (page == 1
-            and self.filehandler.archive_type is not None
-            and prefs['archive thumbnail as icon']):
-            pixbuf = self.imagehandler.get_thumbnail(page, 48, 48)
-            self.set_icon(pixbuf)
+        if page == 1:
+            self.update_icon(False)
 
     def _on_file_opened(self):
         self.uimanager.set_sensitivities()
@@ -742,6 +748,11 @@ class MainWindow(Gtk.Window):
         # No need to call draw_image explicitely,
         # as we'll be receiving a window state
         # change or resize event.
+
+    def change_invert_color(self, toggleaction):
+        prefs['invert color'] = not self.enhancer.invert_color
+        self.enhancer.invert_color = prefs['invert color']
+        self.enhancer.signal_update()
 
     def change_zoom_mode(self, radioaction=None, *args):
         if radioaction:

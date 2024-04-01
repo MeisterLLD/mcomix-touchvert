@@ -243,12 +243,21 @@ class _PreferencesDialog(Gtk.Dialog):
 
         page.new_section(_('Fit to size mode'))
 
-        page.add_row(Gtk.Label(label=_('Fit to width or height:')),
-            self._create_fitmode_control())
+        page.add_row(Gtk.Label(label=_('Fixed width for wide pages:')),
+            self._create_pref_spinner('fit to size width wide',
+            1, 10, constants.RENDER_SIZE_LIMIT, 10, 50, 0, None))
 
-        page.add_row(Gtk.Label(label=_('Fixed size for this mode:')),
-            self._create_pref_spinner('fit to size px',
-            1, 10, 10000, 10, 50, 0, None))
+        page.add_row(Gtk.Label(label=_('Fixed height for wide pages:')),
+            self._create_pref_spinner('fit to size height wide',
+            1, 10, constants.RENDER_SIZE_LIMIT, 10, 50, 0, None))
+
+        page.add_row(Gtk.Label(label=_('Fixed width for other pages:')),
+            self._create_pref_spinner('fit to size width other',
+            1, 10, constants.RENDER_SIZE_LIMIT, 10, 50, 0, None))
+
+        page.add_row(Gtk.Label(label=_('Fixed height for other pages:')),
+            self._create_pref_spinner('fit to size height other',
+            1, 10, constants.RENDER_SIZE_LIMIT, 10, 50, 0, None))
 
         page.new_section(_('Slideshow'))
 
@@ -474,28 +483,6 @@ class _PreferencesDialog(Gtk.Dialog):
             value = combobox.get_model().get_value(iter, 1)
             prefs['double page autoresize'] = value
             self._window.draw_image()
-
-    def _create_fitmode_control(self):
-        """ Combobox for fit to size mode """
-        items = (
-                (_('Fit to width'), int(constants.ZoomMode.WIDTH)),
-                (_('Fit to height'), int(constants.ZoomMode.HEIGHT)))
-
-        box = self._create_combobox(items,
-                prefs['fit to size mode'],
-                self._fit_to_size_changed_cb)
-
-        return box
-
-    def _fit_to_size_changed_cb(self, combobox, *args):
-        """ Change to 'Fit to size' pixels """
-        iter = combobox.get_active_iter()
-        if combobox.get_model().iter_is_valid(iter):
-            value = combobox.get_model().get_value(iter, 1)
-
-            if prefs['fit to size mode'] != value:
-                prefs['fit to size mode'] = value
-                self._window.change_zoom_mode()
 
     def _create_sort_by_control(self):
         """ Creates the ComboBox control for selecting file sort by options. """
@@ -808,11 +795,11 @@ class _PreferencesDialog(Gtk.Dialog):
                 prefs['color box thumb bg'] = False
                 prefs['thumbnail bg uses main colour'] = False
 
-                pixbuf = image_tools.static_image(image_tools.unwrap_image(
-                    self._window.images[0])) # XXX transitional(double page limitation)
-                if pixbuf:
-                    bg_color = image_tools.get_most_common_edge_colour(pixbuf)
-                    self._window.thumbnailsidebar.change_thumbnail_background_color(bg_color)
+                if self._window.imagehandler.page_is_available():
+                    pixbuf_count = 2 if self._window.displayed_double() else 1 # XXX limited to at most 2 pages
+                    bg_colour = self._window.imagehandler.get_pixbuf_auto_background(pixbuf_count)
+                    self._window.thumbnailsidebar.change_thumbnail_background_color(bg_colour)
+
             else:
                 self._window.draw_image()
 
@@ -826,6 +813,9 @@ class _PreferencesDialog(Gtk.Dialog):
 
         elif preference == 'show page numbers on thumbnails':
             self._window.thumbnailsidebar.toggle_page_numbers_visible()
+
+        elif preference == 'archive thumbnail as icon':
+            self._window.update_icon(True)
 
     def _color_button_cb(self, colorbutton, preference):
         """Callback for the background colour selection button."""
@@ -897,7 +887,8 @@ class _PreferencesDialog(Gtk.Dialog):
             prefs['number of key presses before page turn'] = int(value)
             self._window._event_handler._extra_scroll_events = 0
 
-        elif preference == 'fit to size px':
+        elif preference in ('fit to size width wide', 'fit to size height wide',
+            'fit to size width other', 'fit to size height other',):
             prefs[preference] = int(value)
             self._window.change_zoom_mode()
 

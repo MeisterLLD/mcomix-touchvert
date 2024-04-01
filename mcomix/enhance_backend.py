@@ -1,9 +1,11 @@
 """enhance_backend.py - Image enhancement handler and dialog (e.g. contrast,
 brightness etc.)
 """
+from gi.repository import GLib
 
 from mcomix.preferences import prefs
 from mcomix import image_tools
+from mcomix.library import main_dialog
 
 class ImageEnhancer(object):
 
@@ -19,16 +21,18 @@ class ImageEnhancer(object):
         self.saturation = prefs['saturation']
         self.sharpness = prefs['sharpness']
         self.autocontrast = prefs['auto contrast']
+        self.invert_color = prefs['invert color']
 
     def enhance(self, pixbuf):
         """Return an "enhanced" version of <pixbuf>."""
 
         if (self.brightness != 1.0 or self.contrast != 1.0 or
           self.saturation != 1.0 or self.sharpness != 1.0 or
-          self.autocontrast):
+          self.autocontrast or self.invert_color):
 
             return image_tools.enhance(pixbuf, self.brightness, self.contrast,
-                self.saturation, self.sharpness, self.autocontrast)
+                self.saturation, self.sharpness, self.autocontrast,
+                self.invert_color)
 
         return pixbuf
 
@@ -37,5 +41,13 @@ class ImageEnhancer(object):
         values has been made.
         """
         self._window.draw_image()
+
+        self._window.thumbnailsidebar.clear()
+        GLib.idle_add(self._window.thumbnailsidebar.load_thumbnails)
+
+        if main_dialog._dialog is not None:
+            main_dialog._dialog.book_area.load_covers()
+
+        self._window.update_icon(False)
 
 # vim: expandtab:sw=4:ts=4
