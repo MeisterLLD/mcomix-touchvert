@@ -559,7 +559,7 @@ class EventHandler(object):
                 swipe_inc=1
 
             # Choose minimum swipe distance as percentage of screen width
-            swipe_dist_min = 0.15 * self._window.get_screen().get_width()
+            swipe_dist_min = 0.07 * self._window.get_screen().get_width()
 
             # Handle swipes but preserve the old functionality to advance on click
             if not self._window.was_out_of_focus:
