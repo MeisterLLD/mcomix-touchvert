@@ -563,9 +563,9 @@ class EventHandler(object):
 
             # Handle swipes but preserve the old functionality to advance on click
             if not self._window.was_out_of_focus:
-                if event.x_root < self._pressed_pointer_pos_x - swipe_dist_min:
+                if event.y_root > self._pressed_pointer_pos_y - swipe_dist_min:
                     self._flip_page(swipe_inc)
-                elif event.x_root > self._pressed_pointer_pos_x + swipe_dist_min:
+                elif event.y_root < self._pressed_pointer_pos_y + swipe_dist_min:
                     self._flip_page(-swipe_inc)
                 elif (event.time - self._last_pressed_time) > 1000:
                     # For touch screens, toggle Fullscreen on long press (if not swiping)
@@ -573,7 +573,7 @@ class EventHandler(object):
                         self._window.actiongroup.get_action('fullscreen').set_active(False)
                     else:
                         self._window.actiongroup.get_action('fullscreen').set_active(True)
-                elif event.x_root == self._pressed_pointer_pos_x:
+                elif event.y_root == self._pressed_pointer_pos_y:
                     # This is the original action. Advance on click.
                     self._flip_page(swipe_inc) 
             else:
